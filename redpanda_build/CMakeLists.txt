@@ -49,5 +49,5 @@ target_include_directories(avro
 
 add_library(Avro::avro ALIAS avro)
 
-add_executable (avrogencpp impl/avrogencpp.cc)
+add_executable (avrogencpp ../lang/c++/impl/avrogencpp.cc)
 target_link_libraries (avrogencpp avrocpp_s ${Boost_LIBRARIES} ${SNAPPY_LIBRARIES})
