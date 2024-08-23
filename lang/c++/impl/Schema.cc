@@ -40,6 +40,10 @@ void RecordSchema::addField(const std::string &name, const Schema &fieldSchema, 
     node_->addLeaf(fieldSchema.root());
 
     node_->addCustomAttributesForField(customFields);
+
+    // The default will be a null value for unions, or no default for
+    // non-unions.
+    node_->addDefaultForField(GenericDatum());
 }
 
 std::string RecordSchema::getDoc() const {

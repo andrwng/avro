@@ -329,8 +329,11 @@ void NodeRecord::printJson(std::ostream &os, size_t depth) const {
 
         // Serialize "default" field:
         if (!fieldsDefaultValues_.empty()) {
-            if (!fieldsDefaultValues_[i].isUnion() && fieldsDefaultValues_[i].type() == AVRO_NULL) {
-                // No "default" field.
+            if (fieldsDefaultValues_[i].type() == AVRO_NULL) {
+                if (leafAttributes_.get(i)->type() == AVRO_UNION) {
+                  os << ",\n"
+                    << indent(depth) << "\"default\": null";
+                }
             } else {
                 os << ",\n"
                    << indent(depth) << "\"default\": ";

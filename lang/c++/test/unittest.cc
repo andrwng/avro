@@ -1139,6 +1139,34 @@ void testArraySchemaElementId() {
     BOOST_CHECK_EQUAL(expected, actual.str());
 }
 
+void testUnionHasDefault() {
+    auto u = avro::RecordSchema("union");
+    UnionSchema onion;
+    onion.addType(NullSchema());
+    onion.addType(FloatSchema());
+    u.addField("onion", onion);
+    avro::ValidSchema v(u);
+
+    std::ostringstream actual;
+    v.toJson(actual);
+    auto expected = R"({
+    "type": "record",
+    "name": "union",
+    "fields": [
+        {
+            "name": "onion",
+            "type": [
+                "null",
+                "float"
+            ],
+            "default": null
+        }
+    ]
+}
+)";
+    BOOST_CHECK_EQUAL(expected, actual.str());
+}
+
 boost::unit_test::test_suite *
 init_unit_test_suite(int /*argc*/, char * /*argv*/[]) {
     using namespace boost::unit_test;
@@ -1160,6 +1188,7 @@ init_unit_test_suite(int /*argc*/, char * /*argv*/[]) {
     test->add(BOOST_TEST_CASE(&testNestedArraySchema));
     test->add(BOOST_TEST_CASE(&testNestedMapSchema));
     test->add(BOOST_TEST_CASE(&testArraySchemaElementId));
+    test->add(BOOST_TEST_CASE(&testUnionHasDefault));
 
     return test;
 }
