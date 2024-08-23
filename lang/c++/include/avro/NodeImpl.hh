@@ -339,8 +339,11 @@ public:
         return ((nameAttribute_.size() == 1) && (leafAttributes_.size() == leafNameAttributes_.size()) && (customAttributes_.size() == 0 || customAttributes_.size() == leafAttributes_.size()));
     }
 
+    size_t defaultValues() const override {
+        return fieldsDefaultValues_.size();
+    }
     const GenericDatum &defaultValueAt(size_t index) const override {
-        return fieldsDefaultValues_[index];
+        return fieldsDefaultValues_.at(index);
     }
     void doAddDefault(const GenericDatum &fieldDefault) override {
         fieldsDefaultValues_.push_back(fieldDefault);

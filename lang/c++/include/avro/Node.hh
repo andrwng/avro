@@ -144,6 +144,10 @@ public:
     }
     virtual size_t leaves() const = 0;
     virtual const NodePtr &leafAt(size_t index) const = 0;
+
+    virtual size_t defaultValues() const {
+        return 0;
+    }
     virtual const GenericDatum &defaultValueAt(size_t index) const {
         throw Exception("No default value at: {}", index);
     }
