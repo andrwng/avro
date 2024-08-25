@@ -166,6 +166,7 @@ protected:
     bool isValid() const override = 0;
 
     void printBasicInfo(std::ostream &os) const override;
+    void printDebugInfo(std::ostream &os) const override;
 
     void setLeafToSymbolic(size_t index, const NodePtr &node) override;
 
@@ -351,6 +352,7 @@ public:
 
 
     void printDefaultToJson(const GenericDatum &g, std::ostream &os, size_t depth) const override;
+    void printDebugInfo(std::ostream& os) const override;
 };
 
 class AVRO_DECL NodeEnum : public NodeImplEnum {
@@ -409,6 +411,7 @@ public:
 
     void printDefaultToJson(const GenericDatum &g, std::ostream &os, size_t depth) const override;
 
+    void printDebugInfo(std::ostream& os) const override;
     std::optional<int64_t> elementId_;
 };
 
@@ -559,6 +562,39 @@ NodeImpl<A, B, C, D, E>::printBasicInfo(std::ostream &os) const {
         }
         if (type() != AVRO_SYMBOLIC && leafAttributes_.hasAttribute) {
             leafAt(i)->printBasicInfo(os);
+        }
+    }
+    if (isCompound(type())) {
+        os << "end " << type() << '\n';
+    }
+}
+
+template<class A, class B, class C, class D, class E>
+inline void
+NodeImpl<A, B, C, D, E>::printDebugInfo(std::ostream &os) const {
+    os << type();
+    if (hasName()) {
+        os << " name:" << nameAttribute_.get();
+    }
+
+    if (E::hasAttribute) {
+        os << " size:" << sizeAttribute_.get();
+    }
+    os << " custom:";
+    customAttributes_.printDebugInfo(os);
+    os << " name_idx:";
+    nameIndex_.printDebugInfo(os);
+    os << " ";
+
+    os << '\n';
+    size_t count = leaves();
+    count = count ? count : names();
+    for (size_t i = 0; i < count; ++i) {
+        if (C::hasAttribute) {
+            os << "name " << nameAt(i) << '\n';
+        }
+        if (type() != AVRO_SYMBOLIC && leafAttributes_.hasAttribute) {
+            leafAt(i)->printDebugInfo(os);
         }
     }
     if (isCompound(type())) {

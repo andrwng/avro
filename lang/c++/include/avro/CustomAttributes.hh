@@ -47,6 +47,19 @@ public:
     // Prints the attribute value for the specific attribute.
     void printJson(std::ostream &os, const std::string &name) const;
 
+    explicit operator std::string() const {
+        std::string ret{"customAttributes("};
+        for (const auto& [k, v] : attributes_) {
+            ret += "(";
+            ret += k;
+            ret += ",";
+            ret += v;
+            ret += "),";
+        }
+        ret += ")";
+        return ret;
+    }
+
 private:
     std::map<std::string, std::string> attributes_;
 };

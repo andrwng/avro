@@ -19,6 +19,8 @@
 #include "GenericDatum.hh"
 #include "NodeImpl.hh"
 
+#include <iostream>
+
 using std::string;
 using std::vector;
 
@@ -32,6 +34,55 @@ GenericDatum::GenericDatum(const ValidSchema &schema) : type_(schema.root()->typ
 GenericDatum::GenericDatum(const NodePtr &schema) : type_(schema->type()),
                                                     logicalType_(schema->logicalType()) {
     init(schema);
+}
+
+void GenericDatum::printDebugInfo(std::ostream& os) const {
+    os << "GenericDatum: ";
+    os << toString(type_);
+    os << ":";
+    switch (type_) {
+        case AVRO_NULL: break;
+        case AVRO_BOOL:
+            os << std::any_cast<bool>(value_);
+            break;
+        case AVRO_INT:
+            os << std::any_cast<int32_t>(value_);
+            break;
+        case AVRO_LONG:
+            os << std::any_cast<int64_t>(value_);
+            break;
+        case AVRO_FLOAT:
+            os << std::any_cast<float>(value_);
+            break;
+        case AVRO_DOUBLE:
+            os << std::any_cast<double>(value_);
+            break;
+        case AVRO_STRING:
+            os << std::any_cast<string>(value_);
+            break;
+        case AVRO_BYTES:
+            os << "bytes";
+            break;
+        case AVRO_FIXED:
+            os << "fixed";
+            break;
+        case AVRO_RECORD:
+            break;
+        case AVRO_ENUM:
+            os << "enum";
+            break;
+        case AVRO_ARRAY:
+            std::any_cast<GenericArray>(value_).printDebugInfo(os);
+            break;
+        case AVRO_MAP:
+            os << "map";
+            break;
+        case AVRO_UNION:
+            std::any_cast<GenericUnion>(value_).printDebugInfo(os);
+            break;
+        default:
+            throw Exception("Unknown schema type {}", toString(type_));
+    }
 }
 
 void GenericDatum::init(const NodePtr &schema) {
@@ -94,5 +145,31 @@ GenericRecord::GenericRecord(const NodePtr &schema) : GenericContainer(AVRO_RECO
     }
 }
 
+void GenericRecord::printDebugInfo(std::ostream& os) const {
+    os << "GenericRecord(";
+    for (size_t i = 0; i < fields_.size(); ++i) {
+        fields_[i].printDebugInfo(os);
+        os << ",";
+    }
+    os << ")";
+}
+
+
+void GenericArray::printDebugInfo(std::ostream& os) const {
+    os << "GenericArray(";
+    for (size_t i = 0; i < value_.size(); ++i) {
+        value_[i].printDebugInfo(os);
+        os << ",";
+    }
+    os << ")";
+}
+
+void GenericUnion::printDebugInfo(std::ostream& os) const {
+    os << "GenericUnion(";
+    os << curBranch_;
+    os << ",";
+    datum_.printDebugInfo(os);
+    os << ")";
+}
 GenericFixed::GenericFixed(const NodePtr &schema, const vector<uint8_t> &v) : GenericContainer(AVRO_FIXED, schema), value_(v) {}
 } // namespace avro

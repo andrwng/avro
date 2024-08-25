@@ -29,6 +29,8 @@
 #include "Node.hh"
 #include "ValidSchema.hh"
 
+#include <iostream>
+
 namespace avro {
 
 /**
@@ -72,6 +74,7 @@ protected:
     void init(const NodePtr &schema);
 
 public:
+    virtual void printDebugInfo(std::ostream& o) const;
     /**
      * The avro data type this datum holds.
      */
@@ -209,6 +212,7 @@ protected:
     GenericContainer(Type type, const NodePtr &s) : schema_(s) {
         assertType(s, type);
     }
+    virtual void printDebugInfo(std::ostream&) const {}
 
 public:
     /// Returns the schema for this object
@@ -225,6 +229,7 @@ class AVRO_DECL GenericUnion : public GenericContainer {
     GenericDatum datum_;
 
 public:
+    void printDebugInfo(std::ostream& o) const override;
     /**
      * Constructs a generic union corresponding to the given schema \p schema,
      * and the given value. The schema should be of Avro type union
@@ -274,6 +279,7 @@ class AVRO_DECL GenericRecord : public GenericContainer {
     std::vector<GenericDatum> fields_;
 
 public:
+    void printDebugInfo(std::ostream& o) const override;
     /**
      * Constructs a generic record corresponding to the given schema \p schema,
      * which should be of Avro type record.
@@ -351,6 +357,7 @@ public:
  */
 class AVRO_DECL GenericArray : public GenericContainer {
 public:
+    void printDebugInfo(std::ostream& o) const override;
     /**
      * The contents type for the array.
      */

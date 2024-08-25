@@ -186,6 +186,7 @@ public:
     virtual void printJson(std::ostream &os, size_t depth) const = 0;
 
     virtual void printBasicInfo(std::ostream &os) const = 0;
+    virtual void printDebugInfo(std::ostream &os) const = 0;
 
     virtual void setLeafToSymbolic(size_t index, const NodePtr &node) = 0;
 

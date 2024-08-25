@@ -180,6 +180,12 @@ NodeArray::resolve(const Node &reader) const {
     return furtherResolution(reader);
 }
 
+void NodeArray::printDebugInfo(std::ostream& os) const {
+    NodeImplArray::printDebugInfo(os);
+    os << "element id: " << elementId_.value_or(-1);
+    os << '\n';
+}
+
 SchemaResolution
 NodeMap::resolve(const Node &reader) const {
     if (reader.type() == AVRO_MAP) {
@@ -268,6 +274,25 @@ static void printName(std::ostream &os, const Name &n, size_t depth) {
         os << indent(depth) << R"("namespace": ")" << n.ns() << "\",\n";
     }
     os << indent(depth) << R"("name": ")" << n.simpleName() << "\",\n";
+}
+
+void NodeRecord::printDebugInfo(std::ostream& os) const {
+    NodeImplRecord::printDebugInfo(os);
+    os << "aliases:";
+    for (const auto& aliases : fieldsAliases_) {
+        os << "(";
+        for (const auto& alias : aliases) {
+            os << alias << ",";
+        }
+        os << "),";
+    }
+    os << '\n';
+    os << "defaults:";
+    for (const auto& d : fieldsDefaultValues_) {
+        d.printDebugInfo(os);
+        os << ",";
+    }
+    os << '\n';
 }
 
 void NodeRecord::printJson(std::ostream &os, size_t depth) const {

@@ -22,6 +22,7 @@
 #include "Config.hh"
 
 #include "Exception.hh"
+#include <iostream>
 #include <map>
 #include <vector>
 
@@ -74,6 +75,9 @@ struct NoAttribute {
         // just in case
         throw Exception("This type does not have attribute");
     }
+    void printDebugInfo(std::ostream &os) const {
+        os << "NoAttribute";
+    }
 };
 
 template<typename Attribute>
@@ -109,6 +113,9 @@ struct SingleAttribute {
             throw Exception("SingleAttribute has only 1 value");
         }
         return attr_;
+    }
+    void printDebugInfo(std::ostream &os) const {
+        os << "SingleAttribute(" << std::string(attr_) << ")";
     }
 
 private:
@@ -151,6 +158,13 @@ struct MultiAttribute {
     Attribute &get(size_t index) {
         return attrs_.at(index);
     }
+    void printDebugInfo(std::ostream &os) const {
+        os << "MultiAttributes(";
+        for (const auto& a : attrs_) {
+        os << std::string(a) << ",";
+        }
+        os << ")";
+    }
 
 private:
     std::vector<Attribute> attrs_;
@@ -165,6 +179,9 @@ struct NameIndexConcept {
 
     bool add(const ::std::string &, size_t) {
         throw Exception("Name index does not exist");
+    }
+    void printDebugInfo(std::ostream &os) const {
+        os << "NameIndexConcept";
     }
 };
 
@@ -189,6 +206,13 @@ struct NameIndexConcept<MultiAttribute<std::string>> {
             added = true;
         }
         return added;
+    }
+    void printDebugInfo(std::ostream &os) const {
+        os << "NameIndexConcept(";
+        for (const auto& [name, idx] : map_) {
+        os << "(" << name << "," << idx << "),";
+        }
+        os << ")";
     }
 
 private:
