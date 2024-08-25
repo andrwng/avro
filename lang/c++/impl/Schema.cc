@@ -43,7 +43,13 @@ void RecordSchema::addField(const std::string &name, const Schema &fieldSchema, 
 
     // The default will be a null value for unions, or no default for
     // non-unions.
-    node_->addDefaultForField(GenericDatum());
+    if (fieldSchema.root()->type() == AVRO_UNION) {
+        auto un = GenericUnion(fieldSchema.root());
+        un.selectBranch(0);
+        node_->addDefaultForField(GenericDatum(fieldSchema.root(), un));
+    } else {
+        node_->addDefaultForField(GenericDatum());
+    }
 }
 
 std::string RecordSchema::getDoc() const {
